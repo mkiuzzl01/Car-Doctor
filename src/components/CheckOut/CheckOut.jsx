@@ -1,31 +1,64 @@
+import { useContext } from "react";
 import { useLoaderData } from "react-router-dom";
+import { AuthContext } from "../../AuthProvider/AuthProvider";
 
 const CheckOut = () => {
-  const service = useLoaderData();
+  const { user } = useContext(AuthContext);
+  const service = useLoaderData()
+
+  const handleOrder = (e) => {
+    e.preventDefault();
+    const from = e.target;
+    const name = from.name.value;
+    const date = from.date.value;
+    const email = from.email.value;
+    const amount = from.amount.value;
+    const massage = from.massage.value;
+
+    const booking = {customerName:name,date:date,customerEmail:email,amount:amount,customerQuery:massage,serviceName:service.title,serviceId:service._id,image:service.img};
+    console.log(booking);
+
+    fetch('http://localhost:5000/Booking',{
+      method:'POST',
+      headers:{
+        'content-type':'application/json'
+      },
+      body:JSON.stringify(booking),
+    })
+    .then(res=>res.json())
+    .then(data=>{
+      if(data.insertedId){
+        alert('Service is Booked')
+        }
+      })
+  };
 
   return (
     <div className="p-4">
       <div className="card w-full border-2 bg-base-300">
-        <form className="card-body">
+        <h1 className="text-center text-2xl font-semibold py-4">Books Service : {service?.title}</h1>
+        <form onSubmit={handleOrder} className="card-body">
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
             <div className="form-control">
               <label className="label">
-                <span className="label-text">First Name</span>
+                <span className="label-text">Name</span>
               </label>
               <input
+                defaultValue={user?.displayName}
+                name="name"
                 type="text"
-                placeholder="First Name"
+                placeholder="Name"
                 className="input input-bordered"
                 required
               />
             </div>
             <div className="form-control">
               <label className="label">
-                <span className="label-text">Last Name</span>
+                <span className="label-text">Date</span>
               </label>
               <input
-                type="text"
-                placeholder="Last Name"
+                type="date"
+                name="date"
                 className="input input-bordered"
                 required
               />
@@ -35,6 +68,8 @@ const CheckOut = () => {
                 <span className="label-text">Email</span>
               </label>
               <input
+                defaultValue={user?.email}
+                name="email"
                 type="email"
                 placeholder="Email"
                 className="input input-bordered"
@@ -43,11 +78,13 @@ const CheckOut = () => {
             </div>
             <div className="form-control">
               <label className="label">
-                <span className="label-text">Password</span>
+                <span className="label-text">Due Amount</span>
               </label>
               <input
-                type="password"
-                placeholder="Password"
+                name="amount"
+                defaultValue={service.price}
+                type="text"
+                placeholder="Due Amount"
                 className="input input-bordered"
                 required
               />
@@ -61,17 +98,14 @@ const CheckOut = () => {
           <div>
             <textarea
               className="input-bordered w-full textarea"
-              name=""
-              id=""
+              name="massage"
               cols="30"
               rows="10"
               placeholder="Write Your text"
             ></textarea>
           </div>
           <div className="form-control mt-6">
-            <button className="btn bg-[#FF3811] text-white">
-              Order Confirm
-            </button>
+              <input type="submit" className="btn bg-[#FF3811] text-white" value="Order Confirm" />
           </div>
         </form>
       </div>
