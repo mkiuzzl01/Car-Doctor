@@ -1,14 +1,22 @@
-import { Link } from "react-router-dom";
+import { Link, Navigate, useNavigate } from "react-router-dom";
 import logo from "../assets/logo.svg";
-import { useContext } from "react";
-import { AuthContext } from "../AuthProvider/AuthProvider";
+import axios from "axios";
+import useAuth from "../utility/useAuth";
 
 const Navbar = () => {
-  const { logOut, user } = useContext(AuthContext);
-
+  const { logOut, user } = useAuth();
+  const navigate = useNavigate();
   const handleLogOut = () => {
     logOut()
-      .then()
+      .then(() => {
+        axios
+          .post("http://localhost:5000/Logout", user, { withCredentials: true })
+          .then((res) => {
+            if (res.data.success) {
+              navigate("/");
+            }
+          });
+      })
       .then((error) => {
         console.error(error.message);
       });
@@ -56,11 +64,14 @@ const Navbar = () => {
       </div>
       <div className="navbar-end">
         {user ? (
-          <div className="">
+          <div className="flex justify-between items-center space-x-2">
             <p>{user?.email}</p>
-            <button onClick={handleLogOut} className="btn">
-              Sign Out
-            </button>
+            <div>
+              {" "}
+              <button onClick={handleLogOut} className="btn">
+                Sign Out
+              </button>
+            </div>
           </div>
         ) : (
           <div className="space-x-4">

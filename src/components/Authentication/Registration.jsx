@@ -1,37 +1,36 @@
-import { Link } from 'react-router-dom';
-import login_image from '../../assets/images/login/login.svg';
-import { useContext } from 'react';
-import { AuthContext } from '../../AuthProvider/AuthProvider';
-
+import { Link, useLocation, useNavigate } from "react-router-dom";
+import login_image from "../../assets/images/login/login.svg";
+import useAuth from "../../utility/useAuth";
 
 const Registration = () => {
-    const {createUser} = useContext(AuthContext);
+  const { createUser } = useAuth();
+  const location = useLocation();
+  const navigate = useNavigate();
 
-    const handleRegistration = (e) =>{
-        e.preventDefault()
-        const from = e.target;
-        const name = from.name.value;
-        const email = from.email.value;
-        const password = from.password.value;
-        const confirmPassword = from.confirm_password.value;
-        console.log(name,email,password,confirmPassword);
+  const handleRegistration = (e) => {
+    e.preventDefault();
+    const from = e.target;
+    const name = from.name.value;
+    const email = from.email.value;
+    const password = from.password.value;
+    const confirmPassword = from.confirm_password.value;
+    console.log(name, email, password, confirmPassword);
 
-        if(!password === confirmPassword ){
-           return alert('Password not match confirm password')
-        }
-
-        createUser(email,password)
-        .then(result=>{
-            console.log(result);
+    if (password === confirmPassword) {
+        createUser(email, password)
+        .then((result) => {
+          console.log(result);
         })
-        .catch(error=>{
-            console.error(error.message);
-        })
-
-
+        navigate(location?.state? location.state : '/')
+        .catch((error) => {
+          console.error(error.message);
+        });
+    }else{
+      alert("Password not match confirm password");
     }
-    return (
-        <div>
+  };
+  return (
+    <div>
       <div className="hero">
         <div className="hero-content flex-col lg:flex-row">
           <div className="text-center lg:text-left lg:w-1/2">
@@ -39,7 +38,7 @@ const Registration = () => {
           </div>
           <div className="card shrink-0 lg:w-1/2 border-2 bg-base-100">
             <form onSubmit={handleRegistration} className="card-body">
-                <h1 className='text-3xl font-bold text-center'>Sign Up</h1>
+              <h1 className="text-3xl font-bold text-center">Sign Up</h1>
               <div className="form-control">
                 <label className="label">
                   <span className="label-text">Name</span>
@@ -57,7 +56,7 @@ const Registration = () => {
                   <span className="label-text">Email</span>
                 </label>
                 <input
-                name="email"
+                  name="email"
                   type="email"
                   placeholder="email"
                   className="input input-bordered"
@@ -94,15 +93,24 @@ const Registration = () => {
                 </label>
               </div>
               <div className="form-control mt-6 space-y-4">
-              <input type="submit" className="btn bg-orange-500 text-white" value='Sign Up' />
-              <p className='text-center'>If you have an account? <Link to='/Login' className='text-orange-600'>Sign in</Link></p>
+                <input
+                  type="submit"
+                  className="btn bg-orange-500 text-white"
+                  value="Sign Up"
+                />
+                <p className="text-center">
+                  If you have an account?{" "}
+                  <Link to="/Login" className="text-orange-600">
+                    Sign in
+                  </Link>
+                </p>
               </div>
             </form>
           </div>
         </div>
       </div>
     </div>
-    );
+  );
 };
 
 export default Registration;

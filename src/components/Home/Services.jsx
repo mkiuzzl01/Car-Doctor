@@ -1,14 +1,8 @@
-import { useEffect, useState } from "react";
 import Service_Card from "./Service_Card";
+import useServices from "../../utility/useServices";
 
 const Services = () => {
-    const [services,setServices] = useState([]);
-
-    useEffect(()=>{
-        fetch('http://localhost:5000/Services')
-        .then(response=> response.json())
-        .then(data=> setServices(data));
-    },[])
+    const services = useServices();
 
     return (
         <div className="my-8">

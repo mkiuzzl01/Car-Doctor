@@ -1,16 +1,18 @@
-import { useContext, useEffect, useState } from "react";
-import { AuthContext } from "../../AuthProvider/AuthProvider";
+import { useEffect, useState } from "react";
 import BookingData from "./BookingData";
+import useAxiosSecure from "../../utility/useAxiosSecure";
+import useAuth from "../../utility/useAuth";
 
 const Booking = () => {
-  const { user } = useContext(AuthContext);
+  const { user } = useAuth();
+  const axiosSecure = useAxiosSecure();
   const [booking, setBooking] = useState([]);
 
+  const url =`/Booking?email=${user?.email}`;
+  
   useEffect(() => {
-    fetch(`http://localhost:5000/Booking?email=${user?.email}`)
-      .then((res) => res.json())
-      .then((data) => setBooking(data));
-  }, [user]);
+    axiosSecure.get(url).then((res) => setBooking(res.data));
+  }, [url,axiosSecure]);
 
   const handleDelete = (id) => {
     const proceed = confirm("Are you Sure want to Delete?");
@@ -29,31 +31,31 @@ const Booking = () => {
     }
   };
 
-  const handleBookingConfirm = (id) =>{
-    const proceed = confirm('Are you sure want to change status');
-    if(proceed){
-        fetch(`http://localhost:5000/Booking/${id}`,{
-        method:'PATCH',
-        headers:{
-            'content-type':'application/json'
+  const handleBookingConfirm = (id) => {
+    const proceed = confirm("Are you sure want to change status");
+    if (proceed) {
+      fetch(`http://localhost:5000/Booking/${id}`, {
+        method: "PATCH",
+        headers: {
+          "content-type": "application/json",
         },
-        body:JSON.stringify({status:'confirm'})
-        })
-        .then(res=>res.json())
-        .then(data=>{
-            if(data.matchedCount>0){
-                const remaining = booking.filter(book=> book._id !== id);
-                console.log(remaining);
-                const updated = booking.find(book=> book._id === id);
-                console.log(updated);
-                updated.status ='confirm';
-                const newBooking = [updated, ...remaining];
-                console.log(newBooking);
-                setBooking(newBooking)
-            }
-        })
+        body: JSON.stringify({ status: "confirm" }),
+      })
+        .then((res) => res.json())
+        .then((data) => {
+          if (data.matchedCount > 0) {
+            const remaining = booking.filter((book) => book._id !== id);
+            console.log(remaining);
+            const updated = booking.find((book) => book._id === id);
+            console.log(updated);
+            updated.status = "confirm";
+            const newBooking = [updated, ...remaining];
+            console.log(newBooking);
+            setBooking(newBooking);
+          }
+        });
     }
-  }
+  };
 
   return (
     <div>
